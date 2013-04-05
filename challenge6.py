@@ -1,4 +1,8 @@
 #!/usr/bin/python
+
+# Challenge 6: Write a script that creates a CDN-enabled container in
+# Cloud Files. Worth 1 Point
+
 import pyrax
 import os
 

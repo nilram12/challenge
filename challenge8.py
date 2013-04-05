@@ -1,4 +1,11 @@
 #!/usr/bin/python
+
+# Challenge 8: Write a script that will create a static webpage served
+# out of Cloud Files. The script must create a new container, cdn enable
+# it, enable it to serve an index file, create an index file object,
+# upload the object to the container, and create a CNAME record pointing
+# to the CDN URL of the container. Worth 3 Points
+
 import pyrax
 import os
 
@@ -21,7 +28,8 @@ domain=[dom for dom in dns.list()
 cont = cf.create_container(CONTAINER)
 
 cont.make_public();
-cont.store_object(INDEX['name'],INDEX['data'])
+cont.store_object(INDEX['name'],INDEX['data'],
+                  content_type=INDEX['content_type'])
 cont.set_web_index_page(INDEX['name'])
 
 domain.add_records({'type' : 'CNAME', 'name' : CNAME, 

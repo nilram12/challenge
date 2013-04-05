@@ -1,31 +1,31 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
+
+# Challenge 2: Write a script that clones a server (takes an image and
+# deploys the image as a new server). Worth 2 Points
+
 import pyrax
 import os
 import time
 
 CREDENTIALS=os.path.expanduser('~/.rackspace_cloud_credentials')
 NAME="challenge2"
+TMOUT=5
 
 pyrax.set_credential_file(CREDENTIALS)
 cs = pyrax.cloudservers
 
-parent='challenge1-1'
+PARENT='challenge1-1'
 
 server= [srv for srv in cs.servers.list()
-        if parent == srv.name][0]
+        if PARENT == srv.name][0]
 
-#print server.flavor
-#print str(server.flavor)
-#print server.flavor['id']
-#flavor=server.get_id(flavor)
-print "Builiding image .", 
+
 imageid=server.create_image(NAME+'-image')
 image=cs.images.get(imageid)
 
 while(image.status != 'ACTIVE'):
-    time.sleep(10)
-    print ".",
-    image=cs.images.get(imageid)
+    time.sleep(TMOUT)
+    image.get()
 
-print
+
 newserver=cs.servers.create(NAME,image.id,server.flavor['id'])

@@ -1,10 +1,15 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python
+
+# Challenge 7: Write a script that will create 2 Cloud Servers and add
+# them as nodes to a new Cloud Load Balancer. Worth 3 Points
+
 import pyrax
 import time
 import os
 
+
 BASENAME="challenge7"
-IMAGE="Gentoo"     # Just to be different :)
+IMAGE="Gentoo"   
 PORT=80
 PROT='HTTP'
 NUMSERVERS=2
@@ -13,8 +18,8 @@ SIZE=512
 CREDENTIALS=os.path.expanduser('~/.rackspace_cloud_credentials')
 
 pyrax.set_credential_file(CREDENTIALS)
-password={}
-servers={}
+node=[]
+servers=[]
 cs = pyrax.cloudservers
 clb= pyrax.cloud_loadbalancers
 
@@ -24,23 +29,21 @@ image=[img for img in cs.images.list()
 flavor=[flv for flv in cs.flavors.list()
         if flv.ram == SIZE ][0]
 
-for count in range(1,NUMSERVERS+1):
-    name=BASENAME+'-'+str(count)
+for count in range(0,NUMSERVERS):
+    name=BASENAME+'-'+str(count+1)
 
-    servers[name]=cs.servers.create(name,image.id,flavor.id)
-    password[name]=servers[name].adminPass
+    servers.append(cs.servers.create(name,image.id,flavor.id))
     
-for name in sorted(servers.keys()):
-    
-    servers[name]=cs.servers.get(servers[name].id)
-    while (servers[name].networks == {}):
+for count in range(0,NUMSERVERS):
+    servers[count].get()
+    while (servers[count].networks == {}):
         time.sleep(TMOUT)
-        servers[name]=cs.servers.get(servers[name].id)
-    print 
-
-    print "Admin password:", password[name]
-    print "Networks:", servers[name].networks
+        servers[count].get()
+    #end while
+    node.append(clb.Node(address=servers[count].networks['private'][0],
+                         port=PORT, condition='ENABLED'));
+#end for
 
 vip = clb.VirtualIP(type="PUBLIC")
 lb = clb.create(BASENAME, port=PORT, protocol=PROT,  
-                nodes=servers.values(), virtual_ips=[vip])
+                nodes=node, virtual_ips=[vip])
