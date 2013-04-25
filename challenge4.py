@@ -27,7 +27,7 @@ if (len(sys.argv)!=3):
 NAME=sys.argv[1]
 IP=sys.argv[2]
 if (not isip(IP)):
-    print IP," does not appear to be a valid IP address"
+    print IP,"does not appear to be a valid IP address"
     sys.exit(1)
 
 

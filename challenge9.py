@@ -25,7 +25,7 @@ else:
     print FLAVOR, "must be numeric"
     sys.exit(1)
 
-IMAGE=sys.argv[2] #"Gentoo" 
+IMAGE=sys.argv[2] 
 
 FQDN=sys.argv[1] 
 

@@ -35,7 +35,7 @@ for count in range(0,NUMSERVERS):
     
 for name in sorted(servers.keys()):
     
-    servers[name]=cs.servers.get(servers[name].id)
+    servers[name].get()
     while (servers[name].networks == {}):
         time.sleep(TMOUT)
         servers[name].get()

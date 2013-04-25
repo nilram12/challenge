@@ -13,9 +13,19 @@
 import pyrax
 import time
 import os
+import sys
 
-FQDN="challenge10.hendersonacademy.com"
-BASENAME=FQDN[:FQDN.index('.')]
+if (len(sys.argv)!=2):
+    print "Usage:",sys.argv[0],"FQDN" 
+    sys.exit(1)
+
+FQDN=sys.argv[1];
+try:
+    BASENAME=FQDN[:FQDN.index('.')]
+except ValueError:
+    print FQDN,"does not appear to be a valid domain name"
+    sys.exit(1)
+
 IMAGE="Gentoo"   
 PORT=80
 PROT='HTTP'
@@ -41,6 +51,7 @@ ID=os.path.expanduser('~/.ssh/id_rsa.pub')
 
 idfile={"/root/.ssh/authorized_keys": open(ID,'r')}
 
+
 pyrax.set_credential_file(CREDENTIALS)
 cs = pyrax.cloudservers
 cf = pyrax.cloudfiles
@@ -51,15 +62,19 @@ clb= pyrax.cloud_loadbalancers
 servers=[]
 node=[]
 
+try:
+    domain=[dom for dom in dns.list()
+            if FQDN[-len(dom.name):] == dom.name ][0]
+except IndexError:
+    print FQDN,"does not appear to be a valid domain name"
+    sys.exit(1)
+
 
 image=[img for img in cs.images.list()
         if IMAGE in img.name][0]
 
 flavor=[flv for flv in cs.flavors.list()
         if flv.ram == SIZE ][0]
-
-domain=[dom for dom in dns.list()
-        if FQDN[-len(dom.name):] == dom.name ][0]
 
 cont=cf.create_container(BASENAME) #assume it doesn't exist.
 

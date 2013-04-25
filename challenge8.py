@@ -8,22 +8,31 @@
 
 import pyrax
 import os
+import sys
 
 CREDENTIALS=os.path.expanduser('~/.rackspace_cloud_credentials')
 CONTAINER="challenge8"
-CNAME="challenge8.hendersonacademy.com"
 INDEX={
     'name':'index.txt',
     'data':"Hello World!",
     'content_type': 'text/plain'}
 
+if (len(sys.argv)!=2):
+    print "Usage:",sys.argv[0],"CNAME" 
+    sys.exit(1)
+
+CNAME=sys.argv[1];
 
 pyrax.set_credential_file(CREDENTIALS)
 cf=pyrax.cloudfiles
 dns=pyrax.cloud_dns
 
-domain=[dom for dom in dns.list()
-        if CNAME[-len(dom.name):] == dom.name ][0]
+try:
+    domain=[dom for dom in dns.list()
+            if CNAME[-len(dom.name):] == dom.name ][0]
+except IndexError:
+    print CNAME,"does not appear to be a valid domain name"
+    sys.exit(1)
 
 cont = cf.create_container(CONTAINER)
 
